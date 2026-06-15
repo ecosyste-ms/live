@@ -1,0 +1,15 @@
+#events {
+  max-height: 60vh;
+  overflow-y: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.875rem;
+}
+
+#events .event-type {
+  min-width: 10em;
+  display: inline-block;
+}
+
+#events .event-name {
+  word-break: break-all;
+}

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecosyste.ms: Live</title>
+    <meta name="description" content="A live feed of new packages and versions from open source software ecosystems and registries.">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" integrity="sha256-KTPJY0ik6ufLv48oDKCYFYaptcCX75UrmWytfSjy+tA=" crossorigin="anonymous">
+    <link rel="stylesheet" href="/static/app.css">
+  </head>
+  <body>
+    <div class="main">
+      <div class="px-4 container-sm pt-2 mt-5 text-center">
+        <h1 class="display-5 fw-bold">
+          <a href="/" class="text-decoration-hover link-dark">Ecosyste.ms: Live</a>
+        </h1>
+        <div class="col-lg-6 mx-auto">
+          <p class="lead mb-4">
+            A live feed of new packages and versions from open source software ecosystems and registries.
+          </p>
+          <p class="text-muted small">
+            <span id="status" class="badge bg-secondary">connecting</span>
+            <span id="counter">0</span> events
+          </p>
+        </div>
+      </div>
+
+      <div class="container">
+        <ul id="events" class="list-group mb-5"></ul>
+      </div>
+    </div>
+
+    <footer class="py-5 container-sm text-muted text-center">
+      <a class="link-dark" href="/events">SSE feed</a> &mdash;
+      <a class="link-dark" href="/status">Status JSON</a> &mdash;
+      <a class="link-dark" target="_blank" href="https://ecosyste.ms">About</a> &mdash;
+      <a class="link-dark" target="_blank" href="https://blog.ecosyste.ms">Blog</a> &mdash;
+      <a class="link-dark" target="_blank" href="https://ecosystems.appsignal-status.com/">Status</a>
+      <br/>
+      <a class="link-dark" target="_blank" href="https://github.com/ecosyste-ms/live">GitHub</a> &mdash;
+      <a class="link-dark" target="_blank" href="https://opencollective.com/ecosystems">Open Collective</a> &mdash;
+      <a class="link-dark" target="_blank" href="https://mastodon.social/@ecosystems">Mastodon</a>
+      <br/>
+      Code: <a class="link-dark" href="https://github.com/ecosyste-ms/live/blob/main/LICENSE">AGPL-3</a> &mdash;
+      Data: <a class="link-dark" target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>
+    </footer>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
