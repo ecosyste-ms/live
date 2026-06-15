@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
 	"crypto/subtle"
 	"embed"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -147,12 +149,34 @@ func (b *Broker) SubscriberCount() int {
 }
 
 type Server struct {
-	broker *Broker
-	token  string
+	broker    *Broker
+	token     string
+	indexHTML []byte
 }
 
 func NewServer(token string) *Server {
-	return &Server{broker: NewBroker(), token: token}
+	return &Server{broker: NewBroker(), token: token, indexHTML: renderIndex()}
+}
+
+func assetDigest(path string) string {
+	b, err := staticFS.ReadFile("static/" + path)
+	if err != nil {
+		return "0"
+	}
+	sum := sha256.Sum256(b)
+	return hex.EncodeToString(sum[:4])
+}
+
+func renderIndex() []byte {
+	b, err := staticFS.ReadFile("static/index.html")
+	if err != nil {
+		log.Fatalf("read index.html: %v", err)
+	}
+	html := string(b)
+	for _, p := range []string{"css/application.css", "app.css", "app.js"} {
+		html = strings.Replace(html, "/static/"+p, "/static/"+p+"?v="+assetDigest(p), 1)
+	}
+	return []byte(html)
 }
 
 type ingestPayload struct {
@@ -290,13 +314,8 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	b, err := staticFS.ReadFile("static/index.html")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	_, _ = w.Write(b)
+	_, _ = w.Write(s.indexHTML)
 }
 
 func (s *Server) Handler() http.Handler {

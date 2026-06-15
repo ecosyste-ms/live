@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -304,6 +305,25 @@ func TestIndexHTML(t *testing.T) {
 	}
 	if !strings.Contains(w.Body.String(), "Ecosyste.ms: Live") {
 		t.Fatal("expected page title in body")
+	}
+}
+
+func TestIndexAssetDigests(t *testing.T) {
+	s := NewServer("")
+	body := string(s.indexHTML)
+
+	re := regexp.MustCompile(`/static/[^"]+\?v=[0-9a-f]{8}`)
+	matches := re.FindAllString(body, -1)
+	if len(matches) != 3 {
+		t.Fatalf("expected 3 versioned asset urls, got %d: %v", len(matches), matches)
+	}
+	if strings.Contains(body, `"/static/css/application.css"`) {
+		t.Fatal("application.css link is missing ?v= digest")
+	}
+
+	want := assetDigest("app.js")
+	if want == "0" || !strings.Contains(body, "/static/app.js?v="+want) {
+		t.Fatalf("app.js digest %q not found in body", want)
 	}
 }
 
