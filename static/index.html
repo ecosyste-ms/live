@@ -68,6 +68,38 @@
             <ul id="events" class="list-group"></ul>
           </div>
         </div>
+
+        <hr class="my-5">
+
+        <div class="row">
+          <div class="col-lg-10">
+            <h2 class="h4 mb-3">Consuming the feed</h2>
+            <p class="text-muted">
+              <code>GET /events</code> returns a <code>text/event-stream</code>. Each <code>data:</code> line is one
+              JSON event. Filter with <code>?event=</code>, <code>?registry=</code> or <code>?ecosystem=</code>.
+              Send a <code>Last-Event-ID</code> header (or <code>?last_id=</code>) to replay anything missed during a
+              reconnect; the server keeps roughly the last thousand events in memory.
+            </p>
+
+            <pre class="bg-light p-3 rounded small"><code>curl -N https://live.ecosyste.ms/events
+curl -N "https://live.ecosyste.ms/events?ecosystem=npm"
+curl -N -H "Last-Event-ID: 12345" https://live.ecosyste.ms/events</code></pre>
+
+            <pre class="bg-light p-3 rounded small"><code>const es = new EventSource('https://live.ecosyste.ms/events?registry=rubygems.org');
+es.onmessage = (e) =&gt; {
+  const ev = JSON.parse(e.data);
+  console.log(ev.event, ev.package.name, ev.version &amp;&amp; ev.version.number);
+};</code></pre>
+
+            <p class="text-muted">
+              Each event carries <code>registry_url</code>, <code>package_url</code> and (for new versions)
+              <code>version_url</code> linking to the full
+              <a href="https://packages.ecosyste.ms/docs">packages.ecosyste.ms</a> API resource, plus inline
+              <code>package</code> and <code>version</code> objects with the same field names as that API.
+              Follow the URLs for anything not included inline.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
 
