@@ -1,15 +1,26 @@
 #events {
-  max-height: 60vh;
+  max-height: 55vh;
   overflow-y: auto;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 0.875rem;
 }
 
+@media (max-width: 767.98px) {
+  #events {
+    max-height: 40vh;
+  }
+}
+
 #events .event-type {
-  min-width: 10em;
+  min-width: 9em;
   display: inline-block;
+  color: var(--bs-secondary-color);
 }
 
 #events .event-name {
   word-break: break-all;
+}
+
+#events .list-group-item {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
 }
