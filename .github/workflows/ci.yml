@@ -28,6 +28,8 @@ jobs:
         run: go vet ./...
       - name: Test
         run: go test -race ./...
+      - name: Test browser code
+        run: node --test test/app_test.js
 
   lint:
     name: Lint

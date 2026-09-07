@@ -17,6 +17,12 @@
     return e;
   }
 
+  function packagesHTMLURL(href) {
+    var apiRoot = 'https://packages.ecosyste.ms/api/v1/';
+    if (href.indexOf(apiRoot) !== 0) return href;
+    return 'https://packages.ecosyste.ms/' + href.slice(apiRoot.length);
+  }
+
   function render(type, data) {
     var li = el('li', 'list-group-item d-flex justify-content-between align-items-start');
 
@@ -28,7 +34,7 @@
     var label = el('a', 'event-name link-dark', name + (version ? ' ' + version : ''));
     var href = data.version_url || data.package_url || data.registry_url;
     if (href) {
-      label.href = href;
+      label.href = packagesHTMLURL(href);
       label.target = '_blank';
     }
     left.appendChild(label);
