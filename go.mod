@@ -1,3 +1,3 @@
 module github.com/ecosyste-ms/live
 
-go 1.26
+go 1.27

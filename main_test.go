@@ -11,8 +11,15 @@ import (
 	"time"
 )
 
+const (
+	testNPMEcosystem        = "npm"
+	testNPMRegistry         = "npmjs.org"
+	testRubyGemsRegistry    = "rubygems.org"
+	testVersionCreatedEvent = "version.created"
+)
+
 func TestFilterMatch(t *testing.T) {
-	ev := Event{Type: "version.created", Registry: "npmjs.org", Ecosystem: "npm"}
+	ev := Event{Type: testVersionCreatedEvent, Registry: testNPMRegistry, Ecosystem: testNPMEcosystem}
 
 	cases := []struct {
 		name string
@@ -20,13 +27,13 @@ func TestFilterMatch(t *testing.T) {
 		want bool
 	}{
 		{"empty matches all", Filter{}, true},
-		{"event match", Filter{Event: "version.created"}, true},
+		{"event match", Filter{Event: testVersionCreatedEvent}, true},
 		{"event miss", Filter{Event: "package.created"}, false},
-		{"registry match", Filter{Registry: "npmjs.org"}, true},
-		{"registry miss", Filter{Registry: "rubygems.org"}, false},
-		{"ecosystem match", Filter{Ecosystem: "npm"}, true},
-		{"all match", Filter{Event: "version.created", Registry: "npmjs.org", Ecosystem: "npm"}, true},
-		{"partial miss", Filter{Event: "version.created", Registry: "rubygems.org"}, false},
+		{"registry match", Filter{Registry: testNPMRegistry}, true},
+		{"registry miss", Filter{Registry: testRubyGemsRegistry}, false},
+		{"ecosystem match", Filter{Ecosystem: testNPMEcosystem}, true},
+		{"all match", Filter{Event: testVersionCreatedEvent, Registry: testNPMRegistry, Ecosystem: testNPMEcosystem}, true},
+		{"partial miss", Filter{Event: testVersionCreatedEvent, Registry: testRubyGemsRegistry}, false},
 	}
 	for _, tc := range cases {
 		if got := tc.f.Match(ev); got != tc.want {
@@ -40,14 +47,14 @@ func TestBrokerPublishSubscribe(t *testing.T) {
 	sub, unsub := b.Subscribe(Filter{})
 	defer unsub()
 
-	ev := b.Publish("version.created", "npmjs.org", "npm", json.RawMessage(`{"name":"foo"}`))
+	ev := b.Publish(testVersionCreatedEvent, testNPMRegistry, testNPMEcosystem, json.RawMessage(`{"name":"foo"}`))
 	if ev.ID != 1 {
 		t.Fatalf("expected ID 1, got %d", ev.ID)
 	}
 
 	select {
 	case got := <-sub.ch:
-		if got.ID != 1 || got.Type != "version.created" {
+		if got.ID != 1 || got.Type != testVersionCreatedEvent {
 			t.Fatalf("unexpected event %+v", got)
 		}
 	case <-time.After(time.Second):
@@ -57,15 +64,15 @@ func TestBrokerPublishSubscribe(t *testing.T) {
 
 func TestBrokerFilterDelivery(t *testing.T) {
 	b := NewBroker()
-	sub, unsub := b.Subscribe(Filter{Registry: "rubygems.org"})
+	sub, unsub := b.Subscribe(Filter{Registry: testRubyGemsRegistry})
 	defer unsub()
 
-	b.Publish("version.created", "npmjs.org", "npm", json.RawMessage(`{}`))
-	b.Publish("version.created", "rubygems.org", "rubygems", json.RawMessage(`{}`))
+	b.Publish(testVersionCreatedEvent, testNPMRegistry, testNPMEcosystem, json.RawMessage(`{}`))
+	b.Publish(testVersionCreatedEvent, testRubyGemsRegistry, "rubygems", json.RawMessage(`{}`))
 
 	select {
 	case got := <-sub.ch:
-		if got.Registry != "rubygems.org" {
+		if got.Registry != testRubyGemsRegistry {
 			t.Fatalf("expected rubygems.org, got %s", got.Registry)
 		}
 	case <-time.After(time.Second):
@@ -146,7 +153,7 @@ func TestIngestAuthorized(t *testing.T) {
 	if len(got) != 1 {
 		t.Fatalf("expected 1 event in ring, got %d", len(got))
 	}
-	if got[0].Type != "version.created" || got[0].Registry != "npmjs.org" {
+	if got[0].Type != testVersionCreatedEvent || got[0].Registry != testNPMRegistry {
 		t.Fatalf("unexpected event %+v", got[0])
 	}
 	if !strings.Contains(string(got[0].Data), `"name":"foo"`) {
